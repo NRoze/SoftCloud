@@ -4,34 +4,34 @@ using SoftCloud.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#region TBD
+//#region TBD
 
-// Define the credential once
-var credential = new DefaultAzureCredential();
+//// Define the credential once
+//var credential = new DefaultAzureCredential();
 
-// Example: Using it with Key Vault
-var keyVaultUri = builder.Configuration["KeyVault:Uri"];
+//// Example: Using it with Key Vault
+//var keyVaultUri = builder.Configuration["KeyVault:Uri"];
 
-if (!string.IsNullOrEmpty(keyVaultUri))
-{
-    // DefaultAzureCredential handles the auth
-    // AddAzureKeyVault handles the configuration mapping
-    builder.Configuration.AddAzureKeyVault(
-        new Uri(keyVaultUri),
-        new DefaultAzureCredential());
-}
-// Example: Using it with a specific client (e.g., Blob Storage)
-// builder.Services.AddSingleton(new BlobServiceClient(uri, credential));
+//if (!string.IsNullOrEmpty(keyVaultUri))
+//{
+//    // DefaultAzureCredential handles the auth
+//    // AddAzureKeyVault handles the configuration mapping
+//    builder.Configuration.AddAzureKeyVault(
+//        new Uri(keyVaultUri),
+//        new DefaultAzureCredential());
+//}
+//// Example: Using it with a specific client (e.g., Blob Storage)
+//// builder.Services.AddSingleton(new BlobServiceClient(uri, credential));
 
-#endregion
+//#endregion
 
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole();
 
-builder.Services.AddApplicationInsightsTelemetry(options =>
-{
-    options.ConnectionString = builder.Configuration.GetConnectionString("ConnectionStrings:ApplicationInsights");
-});
+//builder.Services.AddApplicationInsightsTelemetry(options =>
+//{
+//    options.ConnectionString = builder.Configuration.GetConnectionString("ConnectionStrings:ApplicationInsights");
+//});
 
 builder.Services.AddProblemDetails(configure =>
 {
