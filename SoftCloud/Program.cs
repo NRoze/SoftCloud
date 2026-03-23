@@ -5,7 +5,6 @@ using SoftCloud.Middlewares;
 var builder = WebApplication.CreateBuilder(args);
 
 //#region TBD
-
 //// Define the credential once
 //var credential = new DefaultAzureCredential();
 
