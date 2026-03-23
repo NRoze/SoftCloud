@@ -11,7 +11,7 @@ namespace SoftCloud.Endpoints
                 return app.MapGet("", () =>
                 {
                     //throw new ValidationException();
-                    return "Hello, World!";
+                    return "Hello from GitHub Actions!";
                 });
             }
         }
