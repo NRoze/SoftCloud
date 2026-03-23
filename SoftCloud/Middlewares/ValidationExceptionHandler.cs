@@ -31,8 +31,9 @@ internal sealed class ValidationExceptionHandler(
             }
         };
 
-        //TBD: Add more details about the validation errors, such as the specific fields that failed validation and the error messages.
+        context.ProblemDetails.Extensions.Add("errorMessage", validationException.ValidationResult.ErrorMessage);
         context.ProblemDetails.Extensions.Add("errors", validationException.ValidationResult.MemberNames);
+        context.ProblemDetails.Extensions.Add("traceId", httpContext.TraceIdentifier);
 
         return await problemDetailsService.TryWriteAsync(context);
     }

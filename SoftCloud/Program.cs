@@ -1,11 +1,37 @@
+using Azure.Identity;
 using SoftCloud.Endpoints;
 using SoftCloud.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Cloud-Native Best Practice: Structured JSON Logging (good for containers/Azure)
+#region TBD
+
+// Define the credential once
+var credential = new DefaultAzureCredential();
+
+// Example: Using it with Key Vault
+var keyVaultUri = builder.Configuration["KeyVault:Uri"];
+
+if (!string.IsNullOrEmpty(keyVaultUri))
+{
+    // DefaultAzureCredential handles the auth
+    // AddAzureKeyVault handles the configuration mapping
+    builder.Configuration.AddAzureKeyVault(
+        new Uri(keyVaultUri),
+        new DefaultAzureCredential());
+}
+// Example: Using it with a specific client (e.g., Blob Storage)
+// builder.Services.AddSingleton(new BlobServiceClient(uri, credential));
+
+#endregion
+
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole();
+
+builder.Services.AddApplicationInsightsTelemetry(options =>
+{
+    options.ConnectionString = builder.Configuration.GetConnectionString("ConnectionStrings:ApplicationInsights");
+});
 
 builder.Services.AddProblemDetails(configure =>
 {
@@ -17,7 +43,6 @@ builder.Services.AddProblemDetails(configure =>
 builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-// Cloud-Native Best Practice: Health Checks for k8s Liveness/Readiness probes
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
