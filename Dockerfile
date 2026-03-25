@@ -3,15 +3,15 @@ WORKDIR /src
 
 # Copy csproj and restore as distinct layers
 COPY Directory.Build.props ./
-COPY Directory.packages.props ./
-COPY ["SoftCloud.csproj", "./"]
+COPY Directory.Packages.props ./
+COPY ["SoftCloud/SoftCloud.csproj", "./SoftCloud/"]
 
-RUN dotnet restore "SoftCloud.csproj"
+RUN dotnet restore "SoftCloud/SoftCloud.csproj"
 
 # Copy everything else and build
 COPY . .
-RUN dotnet build "SoftCloud.csproj" -c Release -o /app/build
-RUN dotnet publish "SoftCloud.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet build "SoftCloud/SoftCloud.csproj" -c Release -o /app/build
+RUN dotnet publish "SoftCloud/SoftCloud.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
