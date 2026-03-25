@@ -1,31 +1,46 @@
+# ===========================
+# Stage 1: Build
+# ===========================
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Copy csproj and restore as distinct layers
+# Copy global MSBuild props/packages first for caching
 COPY Directory.Build.props ./
 COPY Directory.Packages.props ./
-COPY ["SoftCloud/SoftCloud.csproj", "./SoftCloud/"]
 
-RUN dotnet restore "SoftCloud/SoftCloud.csproj"
+# Copy project file(s) only to restore
+COPY SoftCloud/SoftCloud.csproj SoftCloud/
 
-# Copy everything else and build
+# Restore dependencies
+RUN dotnet restore SoftCloud/SoftCloud.csproj
+
+# Copy all source files
 COPY . .
-RUN dotnet build "SoftCloud/SoftCloud.csproj" -c Release -o /app/build
-RUN dotnet publish "SoftCloud/SoftCloud.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+# Build and publish
+RUN dotnet build SoftCloud/SoftCloud.csproj -c Release -o /app/build
+RUN dotnet publish SoftCloud/SoftCloud.csproj -c Release -o /app/publish /p:UseAppHost=false
+
+# ===========================
+# Stage 2: Runtime image
+# ===========================
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
-# Best Practice: Run as non-root user for security (available in .NET 8+)
+# (Optional) run as non-root user for security, available in .NET 8+
+ARG APP_UID=1000
+RUN adduser --disabled-password --uid $APP_UID appuser
 USER $APP_UID
 
+# Copy published app from build stage
 COPY --from=build /app/publish .
 
-# Expose the default ASP.NET Core port (8080 for non-root)
+# Expose default ASP.NET Core port
 EXPOSE 8080
 
+# Healthcheck endpoint
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD curl -f http://localhost:5114/health || exit 1
+  CMD curl -f http://localhost:8080/health || exit 1
 
+# Entry point
 ENTRYPOINT ["dotnet", "SoftCloud.dll"]
