@@ -27,10 +27,10 @@ RUN dotnet publish SoftCloud/SoftCloud.csproj -c Release -o /app/publish /p:UseA
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
-# (Optional) run as non-root user for security, available in .NET 8+
+# Create a non-root user for security
 ARG APP_UID=1000
-RUN adduser --disabled-password --uid $APP_UID appuser
-USER $APP_UID
+RUN useradd -u $APP_UID -m appuser
+USER appuser
 
 # Copy published app from build stage
 COPY --from=build /app/publish .
