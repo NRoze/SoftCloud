@@ -2,7 +2,10 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore as distinct layers
+COPY Directory.Build.props ./
+COPY Directory.packages.props ./
 COPY ["SoftCloud.csproj", "./"]
+
 RUN dotnet restore "SoftCloud.csproj"
 
 # Copy everything else and build
