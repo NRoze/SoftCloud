@@ -1,4 +1,4 @@
-using Azure.Identity;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using SoftCloud.Endpoints;
 using SoftCloud.Middlewares;
 
@@ -27,11 +27,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole();
 
-//builder.Services.AddApplicationInsightsTelemetry(options =>
-//{
-//    options.ConnectionString = builder.Configuration.GetConnectionString("ConnectionStrings:ApplicationInsights");
-//});
-
+builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
+{ 
+    options.ConnectionString = builder.Configuration["ConnectionStrings:ApplicationInsights"];
+});
 builder.Services.AddProblemDetails(configure =>
 {
     configure.CustomizeProblemDetails = context =>
